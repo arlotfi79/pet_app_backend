@@ -1,0 +1,26 @@
+version: '3.3'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: Database-Postgres
+    env_file:
+      - ./env/postgres.env
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./pkg/database/InitSchema.sql:/docker-entrypoint-initdb.d/Database.sql
+    ports:
+      - '5432:5432'
+    restart: unless-stopped
+
+  redis_db:
+    image: redis:6.2.4-alpine
+    volumes:
+      - redis_data:/data
+    ports:
+      - '6379:6379'
+
+volumes:
+  postgres:
+  pgadmin:
+  redis_data:
