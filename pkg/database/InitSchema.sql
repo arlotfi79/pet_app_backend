@@ -114,5 +114,5 @@ CREATE TABLE Shop_Product(
     product_id INT,
     PRIMARY KEY (shop_id, product_id),
     FOREIGN KEY (shop_id) REFERENCES Shop,
-    FOREIGN KEY (product_id) REFERENCES Product,
+    FOREIGN KEY (product_id) REFERENCES Product
 );
