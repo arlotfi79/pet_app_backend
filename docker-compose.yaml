@@ -28,6 +28,7 @@ services:
 
   redis_db:
     image: redis:6.2.4-alpine
+    container_name: Database-Redis
     volumes:
       - redis_data:/data
     ports:
