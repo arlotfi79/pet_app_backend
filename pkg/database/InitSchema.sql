@@ -3,6 +3,7 @@
 CREATE TYPE GENDER AS ENUM('MALE', 'FEMALE', 'OTHER');
 CREATE TYPE EXPERTIZE_LEVEL AS ENUM('EXPERT', 'PROFICIENT', 'COMPETENT', 'ADVANCED_BEGINNER', 'BEGINNER');
 CREATE TYPE EXPERTIZE_AREA AS ENUM('DENTISTRY', 'NUTRITION', 'PATHOLOGY', 'RADIOLOGY', 'SURGERY', 'TOXICOLOGY');
+CREATE TYPE WEEKDAY AS ENUM ('SAT', 'SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI');
 
 -------------------------------------------------------------------------------------
 
@@ -30,13 +31,17 @@ CREATE TABLE Address(
 CREATE TABLE Vet(
     expertize_level EXPERTIZE_LEVEL NOT NULL,
     expertize_area EXPERTIZE_AREA NOT NULL,
-    working_hours_start DATE NOT NULL,
-    working_hours_end DATE NOT NULL
+    working_hours_start_date WEEKDAY NOT NULL,
+    working_hours_end_date WEEKDAY NOT NULL,
+    working_hours_start_hour Time NOT NULL,
+    working_hours_end_hour Time NOT NULL
 ) INHERITS (Account);
 
 CREATE TABLE Pet_Lover(
-    free_time_start DATE NOT NULL,
-    free_time_end DATE NOT NULL
+    free_hours_start_date WEEKDAY NOT NULL,
+    free_hours_end_date WEEKDAY NOT NULL,
+    free_hours_start_hour Time NOT NULL,
+    free_hours_end_hour Time NOT NULL
 ) INHERITS (Account);
 
 CREATE TABLE Pet_Owner();
