@@ -18,6 +18,15 @@ CREATE TABLE Account (
     join_date TIMESTAMP NOT NULL
 );
 
+CREATE TABLE Address(
+    address_id SERIAL PRIMARY KEY,
+    account_id INT REFERENCES Account, -- FK
+    country VARCHAR(25) NOT NULL,
+    city VARCHAR(25) NOT NULL,
+    street VARCHAR(25) NOT NULL,
+    plaque VARCHAR(25) NOT NULL
+);
+
 CREATE TABLE Vet(
     expertize_level EXPERTIZE_LEVEL NOT NULL,
     expertize_area EXPERTIZE_AREA NOT NULL,
