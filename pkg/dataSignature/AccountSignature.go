@@ -11,7 +11,7 @@ type SigninData struct {
 
 // POST
 
-type PostNormalAccount struct {
+type PostBaseAccount struct {
 	Name        string    `json:"name" binding:"required"`
 	LastName    string    `json:"lastName" binding:"required"`
 	UserName    string    `json:"username" binding:"required"`
@@ -23,7 +23,7 @@ type PostNormalAccount struct {
 }
 
 type PostVetAccount struct {
-	PostNormalAccount
+	PostBaseAccount
 	ExpertiseLevel        string    `json:"expertiseLevel" binding:"required"`
 	ExpertiseArea         string    `json:"expertiseArea" binding:"required"`
 	WorkingHoursStartDate string    `json:"workingHoursStartDate" binding:"required"`
@@ -33,7 +33,7 @@ type PostVetAccount struct {
 }
 
 type PostPetLoverAccount struct {
-	PostNormalAccount
+	PostBaseAccount
 	FreeTimeStartDate string    `json:"freeTimeStartDate" binding:"required"`
 	FreeTimeEndDate   string    `json:"freeTimeEndDate" binding:"required"`
 	FreeTimeStartHour time.Time `json:"freeTimeStartHour" binding:"required"`
@@ -42,7 +42,7 @@ type PostPetLoverAccount struct {
 
 // GET
 
-type GetNormalAccount struct {
+type GetBaseAccount struct {
 	Id          uint64    `json:"id" binding:"required"`
 	Name        string    `json:"name" binding:"required"`
 	LastName    string    `json:"lastName" binding:"required"`
@@ -55,7 +55,7 @@ type GetNormalAccount struct {
 }
 
 type GetVetAccount struct {
-	PostNormalAccount
+	PostBaseAccount
 	ExpertiseLevel        string    `json:"expertiseLevel" binding:"required"`
 	ExpertiseArea         string    `json:"expertiseArea" binding:"required"`
 	WorkingHoursStartDate string    `json:"workingHoursStartDate" binding:"required"`
@@ -65,7 +65,7 @@ type GetVetAccount struct {
 }
 
 type GetPetLoverAccount struct {
-	PostNormalAccount
+	PostBaseAccount
 	FreeTimeStartDate string    `json:"freeTimeStartDate" binding:"required"`
 	FreeTimeEndDate   string    `json:"freeTimeEndDate" binding:"required"`
 	FreeTimeStartHour time.Time `json:"freeTimeStartHour" binding:"required"`
@@ -74,7 +74,7 @@ type GetPetLoverAccount struct {
 
 // UPDATE
 
-type UpdateNormalAccount struct {
+type UpdateBaseAccount struct {
 	Name        string `json:"name" binding:"required"`
 	LastName    string `json:"lastName" binding:"required"`
 	UserName    string `json:"username" binding:"required"`
@@ -85,7 +85,7 @@ type UpdateNormalAccount struct {
 }
 
 type UpdateVetAccount struct {
-	PostNormalAccount
+	PostBaseAccount
 	ExpertiseLevel        string    `json:"expertiseLevel" binding:"required"`
 	ExpertiseArea         string    `json:"expertiseArea" binding:"required"`
 	WorkingHoursStartDate string    `json:"workingHoursStartDate" binding:"required"`
@@ -95,7 +95,7 @@ type UpdateVetAccount struct {
 }
 
 type UpdatePetLoverAccount struct {
-	PostNormalAccount
+	PostBaseAccount
 	FreeTimeStartDate string    `json:"freeTimeStartDate" binding:"required"`
 	FreeTimeEndDate   string    `json:"freeTimeEndDate" binding:"required"`
 	FreeTimeStartHour time.Time `json:"freeTimeStartHour" binding:"required"`

@@ -17,10 +17,45 @@ func NewUserQuery(dbClient *Database.Postgresql) *UserQuery {
 
 // CREATE
 
-func (UserQuery *UserQuery) CreateNormalUser(account *DataSignatures.PostNormalAccount) error {
+func (UserQuery *UserQuery) CreatePetOwnerUser(account *DataSignatures.PostBaseAccount) error {
 	db := UserQuery.dbClient.GetDB()
 
-	query, err := db.Prepare(`INSERT INTO Account (name, last_name, user_name, phone_number, password, email, gender, join_date)
+	query, err := db.Prepare(`INSERT INTO Pet_Owner (name, last_name, user_name, phone_number, password, email, gender, join_date)
+									VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`)
+
+	if err != nil {
+		log.Fatalln(err)
+		return err
+	}
+
+	defer query.Close()
+
+	hashedPass, _ := pwd.Encrypt(account.Password)
+	log.Print(hashedPass)
+	// acc.Password = hashedPass
+	_, err = query.Exec(
+		account.Name,
+		account.LastName,
+		account.UserName,
+		account.PhoneNumber,
+		hashedPass,
+		account.Email,
+		account.Gender,
+		account.JoinDate,
+	)
+
+	if err != nil {
+		log.Fatalln(err)
+		return err
+	}
+
+	return nil
+}
+
+func (UserQuery *UserQuery) CreateShopOwnerUser(account *DataSignatures.PostBaseAccount) error {
+	db := UserQuery.dbClient.GetDB()
+
+	query, err := db.Prepare(`INSERT INTO Shop_Owner (name, last_name, user_name, phone_number, password, email, gender, join_date)
 									VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`)
 
 	if err != nil {
@@ -137,10 +172,50 @@ func (UserQuery *UserQuery) CreatePetLoverUser(account *DataSignatures.PostPetLo
 
 // UPDATE
 
-func (UserQuery *UserQuery) UpdateNormalUser(account *DataSignatures.UpdateNormalAccount) error {
+func (UserQuery *UserQuery) UpdatePetOwnerUser(account *DataSignatures.UpdateBaseAccount) error {
 	db := UserQuery.dbClient.GetDB()
 
-	query, err := db.Prepare(`UPDATE Account
+	query, err := db.Prepare(`UPDATE Pet_Owner
+									SET name = $1,
+									    last_name = $2,
+									    user_name = $3, 
+									    password = $4, 
+									    phone_number = $5, 
+									    email = $6, 
+									    gender = $7
+									WHERE user_name = $3`)
+	if err != nil {
+		log.Fatalln(err)
+		return err
+	}
+
+	defer query.Close()
+
+	hashedPass, _ := pwd.Encrypt(account.Password)
+	log.Print(hashedPass)
+	// acc.Password = hashedPass
+	_, err = query.Exec(
+		account.Name,
+		account.LastName,
+		account.UserName,
+		account.PhoneNumber,
+		hashedPass,
+		account.Email,
+		account.Gender,
+	)
+
+	if err != nil {
+		log.Fatalln(err)
+		return err
+	}
+
+	return nil
+}
+
+func (UserQuery *UserQuery) UpdateShopOwnerUser(account *DataSignatures.UpdateBaseAccount) error {
+	db := UserQuery.dbClient.GetDB()
+
+	query, err := db.Prepare(`UPDATE Shop_Owner
 									SET name = $1,
 									    last_name = $2,
 									    user_name = $3, 
@@ -288,10 +363,10 @@ func (UserQuery *UserQuery) UpdatePetLoverUser(account *DataSignatures.UpdatePet
 
 // GET
 
-func (UserQuery *UserQuery) GetUserByUname(username string) ([]DataSignatures.GetNormalAccount, error) {
+func (UserQuery *UserQuery) GetPetOwnerInfoByUname(username string) ([]DataSignatures.GetBaseAccount, error) {
 	db := UserQuery.dbClient.GetDB()
 
-	query, err := db.Prepare(`SELECT * FROM Account WHERE user_name=$1`)
+	query, err := db.Prepare(`SELECT * FROM Pet_Owner WHERE user_name=$1`)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -305,9 +380,9 @@ func (UserQuery *UserQuery) GetUserByUname(username string) ([]DataSignatures.Ge
 		return nil, err
 
 	}
-	var accounts []DataSignatures.GetNormalAccount
+	var accounts []DataSignatures.GetBaseAccount
 	for rows.Next() {
-		var account DataSignatures.GetNormalAccount
+		var account DataSignatures.GetBaseAccount
 
 		err = rows.Scan(&account.Id, &account.Name, &account.LastName, &account.UserName, &account.Password, &account.PhoneNumber, &account.Email, &account.Gender, &account.JoinDate)
 
@@ -320,10 +395,10 @@ func (UserQuery *UserQuery) GetUserByUname(username string) ([]DataSignatures.Ge
 	return accounts, err
 }
 
-func (UserQuery *UserQuery) GetUserByEmail(email string) ([]DataSignatures.GetNormalAccount, error) {
+func (UserQuery *UserQuery) GetShopOwnerInfoByUname(username string) ([]DataSignatures.GetBaseAccount, error) {
 	db := UserQuery.dbClient.GetDB()
 
-	query, err := db.Prepare(`SELECT * FROM Account WHERE email=$1`)
+	query, err := db.Prepare(`SELECT * FROM Shop_Owner WHERE user_name=$1`)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -331,15 +406,15 @@ func (UserQuery *UserQuery) GetUserByEmail(email string) ([]DataSignatures.GetNo
 	}
 
 	defer query.Close()
-	rows, err := query.Query(email)
+	rows, err := query.Query(username)
 	if err != nil {
 		log.Fatalln(err)
 		return nil, err
 
 	}
-	var accounts []DataSignatures.GetNormalAccount
+	var accounts []DataSignatures.GetBaseAccount
 	for rows.Next() {
-		var account DataSignatures.GetNormalAccount
+		var account DataSignatures.GetBaseAccount
 
 		err = rows.Scan(&account.Id, &account.Name, &account.LastName, &account.UserName, &account.Password, &account.PhoneNumber, &account.Email, &account.Gender, &account.JoinDate)
 
@@ -352,10 +427,10 @@ func (UserQuery *UserQuery) GetUserByEmail(email string) ([]DataSignatures.GetNo
 	return accounts, err
 }
 
-func (UserQuery *UserQuery) GetUserByPhoneNumber(phoneNumber string) ([]DataSignatures.GetNormalAccount, error) {
+func (UserQuery *UserQuery) GetVetInfoByUName(username string) ([]DataSignatures.GetVetAccount, error) {
 	db := UserQuery.dbClient.GetDB()
 
-	query, err := db.Prepare(`SELECT * FROM Account WHERE phone_number=$1`)
+	query, err := db.Prepare(`SELECT * FROM Vet WHERE user_name=$1`)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -363,14 +438,82 @@ func (UserQuery *UserQuery) GetUserByPhoneNumber(phoneNumber string) ([]DataSign
 	}
 
 	defer query.Close()
-	rows, err := query.Query(phoneNumber)
+	rows, err := query.Query(username)
 	if err != nil {
 		log.Fatalln(err)
 		return nil, err
 	}
-	var accounts []DataSignatures.GetNormalAccount
+	var accounts []DataSignatures.GetVetAccount
 	for rows.Next() {
-		var account DataSignatures.GetNormalAccount
+		var account DataSignatures.GetVetAccount
+
+		err = rows.Scan(&account.Name, &account.LastName, &account.UserName, &account.Password, &account.PhoneNumber,
+			&account.Email, &account.Gender, &account.JoinDate, &account.ExpertiseLevel, &account.ExpertiseArea,
+			&account.WorkingHoursStartDate, &account.WorkingHoursEndDate, &account.WorkingHoursStartHour,
+			&account.WorkingHoursEndHour)
+
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		accounts = append(accounts, account)
+	}
+	return accounts, err
+}
+
+func (UserQuery *UserQuery) GetPetLoverInfoByUName(username string) ([]DataSignatures.GetPetLoverAccount, error) {
+	db := UserQuery.dbClient.GetDB()
+
+	query, err := db.Prepare(`SELECT * FROM Pet_Lover WHERE user_name=$1`)
+
+	if err != nil {
+		log.Fatalln(err)
+		return nil, err
+	}
+
+	defer query.Close()
+	rows, err := query.Query(username)
+	if err != nil {
+		log.Fatalln(err)
+		return nil, err
+	}
+	var accounts []DataSignatures.GetPetLoverAccount
+	for rows.Next() {
+		var account DataSignatures.GetPetLoverAccount
+
+		err = rows.Scan(&account.Name, &account.LastName, &account.UserName, &account.Password, &account.PhoneNumber,
+			&account.Email, &account.Gender, &account.JoinDate, &account.FreeTimeStartDate, &account.FreeTimeEndDate,
+			&account.FreeTimeStartHour, &account.FreeTimeEndHour)
+
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		accounts = append(accounts, account)
+	}
+	return accounts, err
+}
+
+func (UserQuery *UserQuery) GetAllUsers() ([]DataSignatures.GetBaseAccount, error) {
+	db := UserQuery.dbClient.GetDB()
+
+	query, err := db.Prepare(`SELECT * FROM Account WHERE user_name=$1`)
+
+	if err != nil {
+		log.Fatalln(err)
+		return nil, err
+	}
+
+	defer query.Close()
+	rows, err := query.Query()
+	if err != nil {
+		log.Fatalln(err)
+		return nil, err
+
+	}
+	var accounts []DataSignatures.GetBaseAccount
+	for rows.Next() {
+		var account DataSignatures.GetBaseAccount
 
 		err = rows.Scan(&account.Id, &account.Name, &account.LastName, &account.UserName, &account.Password, &account.PhoneNumber, &account.Email, &account.Gender, &account.JoinDate)
 
@@ -383,33 +526,24 @@ func (UserQuery *UserQuery) GetUserByPhoneNumber(phoneNumber string) ([]DataSign
 	return accounts, err
 }
 
-func (UserQuery *UserQuery) GetUserById(id uint64) ([]DataSignatures.GetNormalAccount, error) {
+// DELETE
+
+func (UserQuery *UserQuery) DeleteUserByUName(username string) error {
 	db := UserQuery.dbClient.GetDB()
 
-	query, err := db.Prepare(`SELECT * FROM Account WHERE account_id=$1`)
+	query, err := db.Prepare(`DELETE FROM Account WHERE user_name=$1`)
 
 	if err != nil {
 		log.Fatalln(err)
-		return nil, err
+		return err
 	}
 
 	defer query.Close()
-	rows, err := query.Query(id)
+	_, err = query.Query(username)
 	if err != nil {
 		log.Fatalln(err)
-		return nil, err
+		return err
+
 	}
-	var accounts []DataSignatures.GetNormalAccount
-	for rows.Next() {
-		var account DataSignatures.GetNormalAccount
-
-		err = rows.Scan(&account.Id, &account.Name, &account.LastName, &account.UserName, &account.Password, &account.PhoneNumber, &account.Email, &account.Gender, &account.JoinDate)
-
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		accounts = append(accounts, account)
-	}
-	return accounts, err
+	return nil
 }
