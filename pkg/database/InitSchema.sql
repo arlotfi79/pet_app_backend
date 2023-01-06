@@ -101,7 +101,6 @@ CREATE TABLE Reaction (
 
 -------------------------------------------------------------------------------------
 
-
 CREATE TABLE Shop(
     shop_id SERIAL PRIMARY KEY,
     shop_owner_id INT REFERENCES Shop_Owner,
