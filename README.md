@@ -27,3 +27,6 @@ assigning roles to team members, developing testing and deploying plans, etc.
 
 ## Environment
 you are expected to develop an application/a web application for this project. No restrictions.
+
+# Database Design
+![Database](assets/Pet Store Management.png)
